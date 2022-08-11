@@ -26,7 +26,8 @@ const relevantEvents = new Set([
   "customer.subscription.updated",
 ])
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+// eslint-disable-next-line import/no-anonymous-default-export
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const buff = await buffer(req)
     const secret = req.headers["stripe-signature"]
@@ -48,8 +49,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     if (relevantEvents.has(type)) {
       try {
         switch (type) {
-          case "customer.subscription.deleted":
           case "customer.subscription.updated":
+          case "customer.subscription.deleted":
             const subscription = event.data.object as Stripe.Subscription
 
             await saveSubscription(
@@ -62,6 +63,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
           case "checkout.session.completed":
             const checkoutSession = event.data.object as Stripe.Checkout.Session
+
             await saveSubscription(
               checkoutSession.subscription.toString(),
               checkoutSession.customer.toString(),
